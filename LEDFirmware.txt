@@ -1,0 +1,426 @@
+#include <msp430fr5739.h>
+
+
+/**
+ * main.c
+ */
+
+volatile unsigned int i = 0;
+//volatile unsigned int count = 0;
+//volatile unsigned int j = 0;
+volatile unsigned int k = 0;
+
+void zero();
+void one();
+void reset();
+
+void sunny();
+void cloudy();
+void rainy();
+void snowy();
+void stormy();
+void night();
+void off();
+
+int main(void)
+{
+    WDTCTL = WDTPW | WDTHOLD;   // stop watchdog timer
+
+    // set up clock
+    CSCTL0 = CSKEY;          // allows for changes to be made to CSCTL registers
+    CSCTL1 = DCOFSEL_2 + DCORSEL;      // DCO frequency select = 16 MHz (pg. 81)
+    CSCTL2 = SELA_3 + SELS_3 + SELM_3;  // all clocks to DCO
+    CSCTL3 = DIVA_0 + DIVS_0 + DIVM_0;  // divider = 1
+
+    // set up outputs to output data feed to LEDs
+    P1DIR |= BIT0; // output
+    P1SEL0 &= ~BIT0;
+    P1SEL1 &= ~BIT0;
+    P1OUT &= ~BIT0;
+
+    //Setup communication pins to get setting to set
+    P1DIR&=~BIT3; //Set pin as input
+    P1SEL0 &= ~BIT3;
+    P1SEL1 &= ~BIT3;
+
+    P1DIR&=~BIT4; //Set pin as input
+    P1SEL0 &= ~BIT4;
+    P1SEL1 &= ~BIT4;
+
+    P1DIR&=~BIT5; //Set pin as input
+    P1SEL0 &= ~BIT5;
+    P1SEL1 &= ~BIT5;
+
+    P4DIR&=~BIT0; //Set pin as input
+    P4SEL0 &= ~BIT0;
+    P1SEL1 &= ~BIT0;
+
+    P3DIR&=~BIT3; //Set pin as input
+    P3SEL0 &= ~BIT3;
+    P3SEL1 &= ~BIT3;
+
+    off();
+
+    while(1){
+        if (P1IN&BIT3){
+            sunny();
+            }
+        else if(P1IN&BIT4){
+             cloudy();
+            }
+      else if(P1IN&BIT5){
+            rainy();
+            }
+      else if(P4IN&BIT0){
+            snowy();
+            }
+
+      else if(P3IN&BIT3){
+            stormy();
+            }
+/*        else if(P1IN&(!BIT4+BIT5+!BIT3)){ ///
+            night();
+            }*/
+        else {
+            off();
+            }
+        }
+
+}
+
+void zero(){
+
+    // 0 code
+     P1OUT |= BIT0;
+     _NOP();
+     P1OUT &= ~ BIT0;
+     _NOP();
+     _NOP();
+     _NOP();
+     _NOP();
+     _NOP();
+     _NOP();
+     _NOP();
+
+}
+
+void one(){
+
+    // 1 code
+    P1OUT = BIT0;
+    _NOP();
+    _NOP();
+    _NOP();
+    _NOP();
+    _NOP();
+    _NOP();
+    P1OUT &= ~BIT0;
+    _NOP();
+    _NOP();
+
+
+
+}
+
+void reset(){
+    P1OUT &= ~BIT0;
+
+    for (i=0;i<10000;i++){
+        _NOP();
+    }
+}
+
+//Sunny mode (complete)
+void sunny(){
+
+          // send output to LEDs
+          for (k = 0; k < 26; k++) //do first 4 and then expand!! 26=all fro ws2811
+          {
+
+              //Blue code
+              zero();
+              zero();
+              zero();
+              zero();
+              zero();
+              zero();
+              zero();
+              zero();
+
+              //Red code
+              one();
+              one();
+              one();
+              one();
+              one();
+              one();
+              one();
+              one();
+
+              //Green code
+              zero();
+              zero();
+              zero();
+              one();
+              one();
+              one();
+              one();
+              one();
+          }
+
+          reset();
+
+}
+
+//Cloudy mode
+void cloudy(){
+    // send output to LEDs
+    for (k = 0; k < 26; k++) //do first 4 and then expand!! 26=all fro ws2811
+    {
+
+        //Blue code
+        zero();
+        zero();
+        zero();
+        one();
+        one();
+        one();
+        one();
+        one();
+
+        //Red code
+        zero();
+        zero();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+
+        //Green code
+        zero();
+        zero();
+        zero();
+        one();
+        one();
+        one();
+        one();
+        one();
+
+    }
+
+    reset();
+
+}
+
+//Rainy mode (complete)
+void rainy(){
+    // send output to LEDs
+    for (k = 0; k < 26; k++) //do first 4 and then expand!! 26=all fro ws2811
+    {
+
+        //Blue code
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+
+        //Red code
+        zero();
+        zero();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+
+        //Green code
+        zero();
+        zero();
+        zero();
+        zero();
+        one();
+        one();
+        one();
+        one();
+
+
+    }
+
+    reset();
+
+}
+
+//Snowy mode
+void snowy(){
+    // send output to LEDs
+    for (k = 0; k < 26; k++) //do first 4 and then expand!! 26=all fro ws2811
+    {
+
+        //Blue code
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+
+        //Red code
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+
+        //Green code
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+
+    }
+
+    reset();
+
+}
+
+//Stormy mode (complete)
+void stormy(){
+    // send output to LEDs
+    for (k = 0; k < 26; k++) //do first 4 and then expand!! 26=all fro ws2811
+    {
+
+        //Blue code
+        zero();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+
+        //Red code
+        zero();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+
+        //Green code
+        zero();
+        zero();
+        zero();
+        one();
+        one();
+        one();
+        one();
+        one();
+    }
+
+    reset();
+
+}
+
+//Night mode??
+void night(){
+    // send output to LEDs
+    for (k = 0; k < 26; k++) //do first 4 and then expand!! 26=all fro ws2811
+    {
+
+        //Blue code
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+        one();
+
+        //Red code
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+
+
+        //Green code
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+
+    }
+
+    reset();
+
+}
+
+//Off mode (complete)
+void off(){
+    // send output to LEDs
+    for (k = 0; k < 26; k++) //do first 4 and then expand!! 26=all fro ws2811
+    {
+
+        //Blue code
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+
+        //Red code
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+
+        //Green code
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+        zero();
+
+    }
+
+    reset();
+
+}
